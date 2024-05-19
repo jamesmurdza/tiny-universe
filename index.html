@@ -54,6 +54,7 @@
             grid-template-columns: repeat(var(--num-cols), var(--tile-size));
             grid-template-rows: repeat(var(--num-rows), var(--tile-size));
             grid-gap: var(--gap-size);
+            position: relative;
         }
 
         .tile {
@@ -87,6 +88,23 @@
             text-align: center;
             margin-right: 50px;
             border-radius: 5px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.842);
+            border: 2px solid rgba(0, 0, 0, 0.526);
+            padding: 10px;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 10;
+            color: #000;
+        }
+
+        .tooltip.show {
+            opacity: 1;
         }
     </style>
 </head>
@@ -125,7 +143,7 @@
             grid.appendChild(tile);
         }
 
-        function addGridItem(topLeftX, topLeftY, width, height, innerHTML) {
+        function addGridItem(topLeftX, topLeftY, width, height, innerHTML, tooltipText) {
             // Calculate the position and size of the custom item
             const x = topLeftX * (TILE_SIZE + GAP_SIZE);
             const y = topLeftY * (TILE_SIZE + GAP_SIZE);
@@ -140,6 +158,25 @@
             customItem.style.top = `${y}px`;
             customItem.innerHTML = innerHTML;
 
+            // Add tooltip functionality
+            if (tooltipText) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'tooltip';
+                tooltip.innerHTML = tooltipText;
+                document.body.appendChild(tooltip);
+
+                customItem.addEventListener('mouseover', (event) => {
+                    const rect = customItem.getBoundingClientRect();
+                    tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - tooltip.offsetWidth / 2}px`;
+                    tooltip.style.top = `${rect.top + window.scrollY - tooltip.offsetHeight - 10}px`;
+                    tooltip.classList.add('show');
+                });
+
+                customItem.addEventListener('mouseout', () => {
+                    tooltip.classList.remove('show');
+                });
+            }
+
             grid.appendChild(customItem);
         }
 
@@ -152,10 +189,6 @@
 
             const translateY = (1 - scale) * (gridHeight / 2);
 
-            //const scaledGridHeight = gridHeight * scale;
-            //container.style.height = `${scaledGridHeight}px`;
-
-
             container.style.transform = `translateY(${-translateY}px) scale(${scale})`;
         }
 
@@ -163,13 +196,16 @@
         scaleGridToFit();
 
         // Example usage
-        addGridItem(2, 2, 3, 3, "<img src='images/house.png' style='width:100%; height:100%;' />");
-        addGridItem(15, 15, 1, 1, "<img src='images/bamse.png' style='width:100%; height:100%;' />");
-        addGridItem(5, 2, 1, 5, "<div style='background-color:#618cf1; width:100%; height:100%;'></div>");
-        addGridItem(15, 4, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🦖</div>");
-        addGridItem(18, 4, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🌳</div>");
-        addGridItem(18, 5, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🌳</div>");
-        addGridItem(18, 6, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🌳</div>");
+        addGridItem(2, 2, 3, 3, "<img src='images/house.png' style='width:100%; height:100%;' />", "This is a house");
+        addGridItem(15, 15, 1, 1, "<img src='images/bamse.png' style='width:100%; height:100%;' />", "This is Bamse");
+        addGridItem(5, 2, 3, 5, "<div style='background-color:#618cf1; width:100%; height:100%;'></div>", "The pond");
+        addGridItem(6, 3, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🐡</div>", "A fish");
+        addGridItem(8, 5, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🪿</div>", "A goose");
+        addGridItem(15, 4, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🦖</div>", "A dinosaur emoji");
+        addGridItem(12, 8, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🛵</div>", "A scooter emoji");
+        addGridItem(18, 4, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🌳</div>", "A tree emoji");
+        addGridItem(18, 5, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🌳</div>", "Another tree emoji");
+        addGridItem(18, 6, 1, 1, "<div style='width:100%; height:100%; font-size:var(--tile-size); line-height:var(--tile-size);'>🌳</div>", "Yet another tree emoji");
     </script>
 </body>
 </html>
